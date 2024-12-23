@@ -1,7 +1,7 @@
 package main
 
 import (
-	user "bwastartup/user/users"
+	"bwastartup/user"
 	"github.com/gin-gonic/gin"
 	"log"
 	"net/http"
