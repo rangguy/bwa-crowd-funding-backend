@@ -3,6 +3,7 @@ package handler
 import (
 	"bwastartup/helper"
 	"bwastartup/user"
+	"fmt"
 	"github.com/gin-gonic/gin"
 	"net/http"
 )
@@ -123,7 +124,10 @@ func (h *UserHandler) UploadAvatar(c *gin.Context) {
 		return
 	}
 
-	path := "images/" + file.Filename
+	// sementara hardcode, nanti akan didapatkan dari JWT
+	userID := 1
+
+	path := fmt.Sprintf("images/%d-%s", userID, file.Filename)
 
 	err = c.SaveUploadedFile(file, path)
 	if err != nil {
@@ -133,9 +137,6 @@ func (h *UserHandler) UploadAvatar(c *gin.Context) {
 		c.JSON(http.StatusBadRequest, response)
 		return
 	}
-
-	// sementara hardcode, nanti akan didapatkan dari JWT
-	userID := 1
 
 	_, err = h.userService.SaveAvatar(userID, path)
 	if err != nil {
