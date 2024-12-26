@@ -1,6 +1,7 @@
 package handler
 
 import (
+	"bwastartup/auth"
 	"bwastartup/helper"
 	"bwastartup/user"
 	"fmt"
@@ -10,10 +11,14 @@ import (
 
 type UserHandler struct {
 	userService user.Service
+	authService auth.Service
 }
 
-func NewUserHandler(userService user.Service) *UserHandler {
-	return &UserHandler{userService}
+func NewUserHandler(userService user.Service, authService auth.Service) *UserHandler {
+	return &UserHandler{
+		userService,
+		authService,
+	}
 }
 
 func (h *UserHandler) RegisterUser(c *gin.Context) {
@@ -26,6 +31,7 @@ func (h *UserHandler) RegisterUser(c *gin.Context) {
 		errorMessage := gin.H{"errors": errors}
 
 		response := helper.APIResponse("Registered account failed", http.StatusUnprocessableEntity, "error", errorMessage)
+
 		c.JSON(http.StatusUnprocessableEntity, response)
 		return
 	}
@@ -34,13 +40,20 @@ func (h *UserHandler) RegisterUser(c *gin.Context) {
 
 	if err != nil {
 		response := helper.APIResponse("Registered account failed", http.StatusBadRequest, "error", nil)
+
 		c.JSON(http.StatusBadRequest, response)
 		return
 	}
 
-	// token, err := h.jwtservice.generatetoken()
+	token, err := h.authService.GenerateToken(newUser.ID)
+	if err != nil {
+		response := helper.APIResponse("Registered account failed", http.StatusBadRequest, "error", nil)
 
-	formatter := user.FormatUser(newUser, "token")
+		c.JSON(http.StatusBadRequest, response)
+		return
+	}
+
+	formatter := user.FormatUser(newUser, token)
 
 	response := helper.APIResponse("Account has been registered", http.StatusOK, "success", formatter)
 
@@ -71,7 +84,15 @@ func (h *UserHandler) Login(c *gin.Context) {
 		return
 	}
 
-	formatter := user.FormatUser(loggedUser, "token")
+	token, err := h.authService.GenerateToken(loggedUser.ID)
+	if err != nil {
+		response := helper.APIResponse("Login failed", http.StatusBadRequest, "error", nil)
+
+		c.JSON(http.StatusBadRequest, response)
+		return
+	}
+
+	formatter := user.FormatUser(loggedUser, token)
 
 	response := helper.APIResponse("Login success", http.StatusOK, "success", formatter)
 
