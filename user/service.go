@@ -70,9 +70,9 @@ func (s *service) IsEmailAvailable(input CheckEmailInput) (bool, error) {
 		return false, err
 	}
 
-	if user.ID != 0 {
-		return false, errors.New("user not available")
+	if user.ID == 0 {
+		return true, nil
 	}
 
-	return true, nil
+	return false, nil
 }
