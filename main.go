@@ -38,3 +38,10 @@ func main() {
 		return
 	}
 }
+
+// ambil nilai header Authorization, Bearer "token"
+// ambil nilai "token" dari header
+// memvalidasi token
+// jika token valid maka mengambil nilai user_id
+// ambil user dari db berdasarkan user_id lewat service
+// jika user ada maka set context (sebuah tempat untuk menyimpan suatu nilai yang nantinya nilai bisa diambil oleh yang lain) yang isinya user
