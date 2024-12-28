@@ -2,6 +2,7 @@ package main
 
 import (
 	"bwastartup/auth"
+	"bwastartup/campaign"
 	"bwastartup/handler"
 	"bwastartup/helper"
 	"bwastartup/user"
@@ -24,6 +25,23 @@ func main() {
 	fmt.Println("Connection Success")
 
 	userRepo := user.NewRepository(db)
+	campaignRepo := campaign.NewRepository(db)
+
+	campaigns, err := campaignRepo.FindByUserID(2)
+
+	if err != nil {
+		log.Fatal(err.Error())
+	}
+	fmt.Println("debug")
+	fmt.Println("debug")
+	fmt.Println("debug")
+
+	fmt.Println(len(campaigns))
+
+	for _, campaign := range campaigns {
+		fmt.Println(campaign.Name)
+	}
+
 	userService := user.NewService(userRepo)
 	authService := auth.NewService()
 
