@@ -34,7 +34,7 @@ func main() {
 	api.POST("/users", userHandler.RegisterUser)
 	api.POST("/sessions", userHandler.Login)
 	api.POST("/email_checkers", userHandler.CheckEmailAvailability)
-	api.POST("/avatars", userHandler.UploadAvatar)
+	api.POST("/avatars", authMiddleware(authService, userService), userHandler.UploadAvatar)
 
 	err = router.Run()
 	if err != nil {
@@ -42,19 +42,25 @@ func main() {
 	}
 }
 
-func authMiddleware(c *gin.Context) {
-	authHeader := c.Request.Header.Get("Authorization")
+func authMiddleware(authService auth.Service, userService user.Service) gin.HandlerFunc {
+	return func(c *gin.Context) {
+		authHeader := c.Request.Header.Get("Authorization")
 
-	if !strings.Contains(authHeader, "Bearer") {
-		response := helper.APIResponse("Unauthorized", http.StatusUnauthorized, "error", nil)
-		c.AbortWithStatusJSON(http.StatusUnauthorized, response)
-		return
+		if !strings.Contains(authHeader, "Bearer") {
+			response := helper.APIResponse("Unauthorized", http.StatusUnauthorized, "error", nil)
+			c.AbortWithStatusJSON(http.StatusUnauthorized, response)
+			return
+		}
+
+		// Bearer "token"
+		tokenString := strings.Split(authHeader, " ")[1]
+
+		token, err := authService.ValidateToken(tokenString)
+		if err != nil {
+			response := helper.APIResponse("Unauthorized", http.StatusUnauthorized, "error", nil)
+			c.AbortWithStatusJSON(http.StatusUnauthorized, response)
+		}
 	}
-
-	// Bearer "token"
-	tokenString := strings.Split(authHeader, " ")[1]
-
-	token, err :=
 }
 
 // ambil nilai header Authorization, Bearer "token"
