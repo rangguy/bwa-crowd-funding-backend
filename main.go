@@ -27,7 +27,7 @@ func main() {
 	userRepo := user.NewRepository(db)
 	campaignRepo := campaign.NewRepository(db)
 
-	campaigns, err := campaignRepo.FindByUserID(2)
+	campaigns, err := campaignRepo.FindByUserID(1)
 
 	if err != nil {
 		log.Fatal(err.Error())
@@ -40,6 +40,9 @@ func main() {
 
 	for _, campaign := range campaigns {
 		fmt.Println(campaign.Name)
+		if len(campaign.CampaignImages) > 0 {
+			fmt.Println(campaign.CampaignImages[0].FileName)
+		}
 	}
 
 	userService := user.NewService(userRepo)
