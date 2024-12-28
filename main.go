@@ -3,12 +3,15 @@ package main
 import (
 	"bwastartup/auth"
 	"bwastartup/handler"
+	"bwastartup/helper"
 	"bwastartup/user"
 	"fmt"
 	"github.com/gin-gonic/gin"
 	"gorm.io/driver/postgres"
 	"gorm.io/gorm"
 	"log"
+	"net/http"
+	"strings"
 )
 
 func main() {
@@ -37,6 +40,21 @@ func main() {
 	if err != nil {
 		return
 	}
+}
+
+func authMiddleware(c *gin.Context) {
+	authHeader := c.Request.Header.Get("Authorization")
+
+	if !strings.Contains(authHeader, "Bearer") {
+		response := helper.APIResponse("Unauthorized", http.StatusUnauthorized, "error", nil)
+		c.AbortWithStatusJSON(http.StatusUnauthorized, response)
+		return
+	}
+
+	// Bearer "token"
+	tokenString := strings.Split(authHeader, " ")[1]
+
+	token, err :=
 }
 
 // ambil nilai header Authorization, Bearer "token"
