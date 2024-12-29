@@ -8,11 +8,6 @@ import (
 	"strconv"
 )
 
-// tangkap parameter di handler
-// handler lalu ke service
-// service menentukan repository mana yang digunakan
-// repository -> db
-
 type CampaignHandler struct {
 	service campaign.Service
 }
