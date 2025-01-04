@@ -88,3 +88,10 @@ func (h *CampaignHandler) CreateCampaign(c *gin.Context) {
 	c.JSON(http.StatusOK, response)
 	return
 }
+
+// get detail campaign
+// user memasukkan input
+// handler
+// input dari user dan input uri
+// service memanggil repository
+// repository update data campaign
