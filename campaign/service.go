@@ -76,7 +76,7 @@ func (s *service) UpdateCampaign(inputID GetCampaignDetailInput, inputUser Creat
 		return campaign, err
 	}
 
-	if inputID.ID != campaign.User.ID {
+	if campaign.UserID != inputUser.User.ID {
 		return campaign, errors.New("user is not the owner of the campaign")
 	}
 
