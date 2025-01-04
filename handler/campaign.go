@@ -89,9 +89,36 @@ func (h *CampaignHandler) CreateCampaign(c *gin.Context) {
 	return
 }
 
-// get detail campaign
-// user memasukkan input
-// handler
-// input dari user dan input uri
-// service memanggil repository
-// repository update data campaign
+func (h *CampaignHandler) UpdateCampaign(c *gin.Context) {
+	var inputID campaign.GetCampaignDetailInput
+
+	err := c.ShouldBindUri(&inputID)
+	if err != nil {
+		response := helper.APIResponse("Failed to get detail of campaign", http.StatusBadRequest, "error", nil)
+		c.JSON(http.StatusBadRequest, response)
+		return
+	}
+
+	var inputUser campaign.CreateCampaignInput
+
+	err = c.ShouldBindJSON(&inputUser)
+	if err != nil {
+		errors := helper.FormatValidationError(err)
+		errorMessage := gin.H{"errors": errors}
+
+		response := helper.APIResponse("Failed to update campaign", http.StatusUnprocessableEntity, "error", errorMessage)
+		c.JSON(http.StatusUnprocessableEntity, response)
+		return
+	}
+
+	updatedCampaign, err := h.service.UpdateCampaign(inputID, inputUser)
+	if err != nil {
+		response := helper.APIResponse("Failed to update campaign", http.StatusBadRequest, "error", nil)
+		c.JSON(http.StatusBadRequest, response)
+		return
+	}
+
+	response := helper.APIResponse("Campaign updated", http.StatusOK, "success", updatedCampaign)
+	c.JSON(http.StatusOK, response)
+	return
+}
