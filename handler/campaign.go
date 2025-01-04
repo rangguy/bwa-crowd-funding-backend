@@ -118,7 +118,7 @@ func (h *CampaignHandler) UpdateCampaign(c *gin.Context) {
 		return
 	}
 
-	response := helper.APIResponse("Campaign updated", http.StatusOK, "success", updatedCampaign)
+	response := helper.APIResponse("Campaign updated", http.StatusOK, "success", campaign.FormatCampaign(updatedCampaign))
 	c.JSON(http.StatusOK, response)
 	return
 }
