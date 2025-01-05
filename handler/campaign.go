@@ -4,6 +4,7 @@ import (
 	"bwastartup/campaign"
 	"bwastartup/helper"
 	"bwastartup/user"
+	"fmt"
 	"github.com/gin-gonic/gin"
 	"net/http"
 	"strconv"
@@ -126,7 +127,54 @@ func (h *CampaignHandler) UpdateCampaign(c *gin.Context) {
 	return
 }
 
-// menangkap input dan ubah ke struct input lalu save image campaign ke dalam folder
-// service mengecek kondisi is_primary terlebih dahulu, lalu memanggil repo yang dibutuhkan
-// mengubah is_primary true menjadi false jika memasukkan data baru yang true juga
-// repository Save image di tabel campaign_images
+func (h *CampaignHandler) UploadImage(c *gin.Context) {
+	var input campaign.CreateCampaignImageInput
+
+	err := c.ShouldBind(&input)
+	if err != nil {
+		errors := helper.FormatValidationError(err)
+		errorMessage := gin.H{"errors": errors}
+
+		response := helper.APIResponse("Failed to upload image", http.StatusBadRequest, "error", errorMessage)
+		c.JSON(http.StatusBadRequest, response)
+		return
+	}
+
+	file, err := c.FormFile("file")
+	if err != nil {
+		data := gin.H{"is_uploaded": false}
+		response := helper.APIResponse("Failed to upload campaign image", http.StatusBadRequest, "error", data)
+
+		c.JSON(http.StatusBadRequest, response)
+		return
+	}
+
+	currentUser := c.MustGet("currentUser").(user.User)
+	userID := currentUser.ID
+
+	path := fmt.Sprintf("images/%d-%s", userID, file.Filename)
+
+	err = c.SaveUploadedFile(file, path)
+	if err != nil {
+		data := gin.H{"is_uploaded": false}
+		response := helper.APIResponse("Failed to upload campaign image", http.StatusBadRequest, "error", data)
+
+		c.JSON(http.StatusBadRequest, response)
+		return
+	}
+
+	_, err = h.service.CreateCampaignImage(input, path)
+	if err != nil {
+		data := gin.H{"is_uploaded": false}
+		response := helper.APIResponse("Failed to upload campaign image", http.StatusBadRequest, "error", data)
+
+		c.JSON(http.StatusBadRequest, response)
+		return
+	}
+
+	data := gin.H{"is_uploaded": true}
+	response := helper.APIResponse("Campaign image successfully uploaded", http.StatusOK, "success", data)
+
+	c.JSON(http.StatusOK, response)
+	return
+}
