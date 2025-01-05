@@ -125,3 +125,8 @@ func (h *CampaignHandler) UpdateCampaign(c *gin.Context) {
 	c.JSON(http.StatusOK, response)
 	return
 }
+
+// menangkap input dan ubah ke struct input lalu save image campaign ke dalam folder
+// service mengecek kondisi is_primary terlebih dahulu, lalu memanggil repo yang dibutuhkan
+// mengubah is_primary true menjadi false jika memasukkan data baru yang true juga
+// repository Save image di tabel campaign_images
