@@ -1,7 +1,7 @@
 package transaction
 
 type Service interface {
-	GetTransactionsByCampaignID(campaignID int) ([]Transaction, error)
+	GetTransactionsByCampaignID(campaignID GetTransactionByCampaignIDInput) ([]Transaction, error)
 }
 
 type service struct {
@@ -12,8 +12,8 @@ func NewService(repo Repository) Service {
 	return &service{repo}
 }
 
-func (s *service) GetTransactionsByCampaignID(campaignID int) ([]Transaction, error) {
-	transactions, err := s.repo.GetByCampaignID(campaignID)
+func (s *service) GetTransactionsByCampaignID(input GetTransactionByCampaignIDInput) ([]Transaction, error) {
+	transactions, err := s.repo.GetByCampaignID(input.ID)
 	if err != nil {
 		return nil, err
 	}
