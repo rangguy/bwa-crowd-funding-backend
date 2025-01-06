@@ -32,9 +32,11 @@ func main() {
 	userService := user.NewService(userRepo)
 	campaignService := campaign.NewService(campaignRepo)
 	authService := auth.NewService()
+	transactionService := transaction.NewService(transactionRepo)
 
 	userHandler := handler.NewUserHandler(userService, authService)
 	campaignHandler := handler.NewCampaignHandler(campaignService)
+	transactionHandler := handler.NewTransactionHandler(transactionService)
 
 	router := gin.Default()
 	router.Static("/images", "./images")
@@ -52,6 +54,9 @@ func main() {
 	api.POST("/campaigns", authMiddleware(authService, userService), campaignHandler.CreateCampaign)
 	api.PUT("/campaigns/:id", authMiddleware(authService, userService), campaignHandler.UpdateCampaign)
 	api.POST("/campaign-images", authMiddleware(authService, userService), campaignHandler.UploadImage)
+
+	// transactions
+	api.GET("/campaigns/:id/transactions", authMiddleware(authService, userService), transactionHandler.GetTransactionsByCampaignID)
 
 	err = router.Run()
 	if err != nil {
