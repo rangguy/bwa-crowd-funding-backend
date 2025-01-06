@@ -5,6 +5,7 @@ import (
 	"bwastartup/campaign"
 	"bwastartup/handler"
 	"bwastartup/helper"
+	"bwastartup/transaction"
 	"bwastartup/user"
 	"fmt"
 	"github.com/gin-gonic/gin"
@@ -26,6 +27,7 @@ func main() {
 
 	userRepo := user.NewRepository(db)
 	campaignRepo := campaign.NewRepository(db)
+	transactionRepo := transaction.NewRepository(db)
 
 	userService := user.NewService(userRepo)
 	campaignService := campaign.NewService(campaignRepo)
