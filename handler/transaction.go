@@ -32,7 +32,9 @@ func (h *TransactionHandler) GetTransactionsByCampaignID(c *gin.Context) {
 		return
 	}
 
-	response := helper.APIResponse("Campaign's transactions", http.StatusOK, "success", transactions)
+	transactionsFormat := transaction.FormatCampaignTransactions(transactions)
+
+	response := helper.APIResponse("Campaign's transactions", http.StatusOK, "success", transactionsFormat)
 	c.JSON(http.StatusOK, response)
 	return
 
