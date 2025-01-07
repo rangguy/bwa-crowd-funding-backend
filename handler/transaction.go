@@ -3,6 +3,7 @@ package handler
 import (
 	"bwastartup/helper"
 	"bwastartup/transaction"
+	"bwastartup/user"
 	"github.com/gin-gonic/gin"
 	"net/http"
 )
@@ -24,6 +25,9 @@ func (h *TransactionHandler) GetTransactionsByCampaignID(c *gin.Context) {
 		c.JSON(http.StatusBadRequest, response)
 		return
 	}
+
+	currentUser := c.MustGet("currentUser").(user.User)
+	input.User = currentUser
 
 	transactions, err := h.service.GetTransactionsByCampaignID(input)
 	if err != nil {

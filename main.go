@@ -32,7 +32,7 @@ func main() {
 	userService := user.NewService(userRepo)
 	campaignService := campaign.NewService(campaignRepo)
 	authService := auth.NewService()
-	transactionService := transaction.NewService(transactionRepo)
+	transactionService := transaction.NewService(transactionRepo, campaignRepo)
 
 	userHandler := handler.NewUserHandler(userService, authService)
 	campaignHandler := handler.NewCampaignHandler(campaignService)
