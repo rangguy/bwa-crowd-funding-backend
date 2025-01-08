@@ -9,6 +9,19 @@ type CampaignTransactionsFormatter struct {
 	CreatedAt time.Time `json:"created_at"`
 }
 
+type UserTransactionsFormatter struct {
+	ID        int               `json:"id"`
+	Amount    int               `json:"amount"`
+	Status    string            `json:"status"`
+	CreatedAt time.Time         `json:"created_at"`
+	Campaign  CampaignFormatter `json:"campaigns"`
+}
+
+type CampaignFormatter struct {
+	Name     string `json:"name"`
+	ImageURL string `json:"image_url"`
+}
+
 func FormatCampaignTransaction(transaction Transaction) CampaignTransactionsFormatter {
 	formatter := CampaignTransactionsFormatter{
 		ID:        transaction.ID,
@@ -29,6 +42,39 @@ func FormatCampaignTransactions(transactions []Transaction) []CampaignTransactio
 
 	for _, transaction := range transactions {
 		transactionsFormatter = append(transactionsFormatter, FormatCampaignTransaction(transaction))
+	}
+
+	return transactionsFormatter
+}
+
+func FormatUserTransaction(transaction Transaction) UserTransactionsFormatter {
+	formatter := UserTransactionsFormatter{
+		ID:        transaction.ID,
+		Amount:    transaction.Amount,
+		Status:    transaction.Status,
+		CreatedAt: transaction.CreatedAt,
+		Campaign: CampaignFormatter{
+			Name:     transaction.Campaign.Name,
+			ImageURL: "",
+		},
+	}
+
+	if len(transaction.Campaign.CampaignImages) > 0 {
+		formatter.Campaign.ImageURL = transaction.Campaign.CampaignImages[0].FileName
+	}
+
+	return formatter
+}
+
+func FormatUserTransactions(transactions []Transaction) []UserTransactionsFormatter {
+	if len(transactions) == 0 {
+		return []UserTransactionsFormatter{}
+	}
+
+	var transactionsFormatter []UserTransactionsFormatter
+
+	for _, transaction := range transactions {
+		transactionsFormatter = append(transactionsFormatter, FormatUserTransaction(transaction))
 	}
 
 	return transactionsFormatter
