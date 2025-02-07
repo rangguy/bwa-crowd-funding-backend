@@ -60,3 +60,8 @@ func (h *TransactionHandler) GetTransactionsByUserID(c *gin.Context) {
 	c.JSON(http.StatusOK, response)
 	return
 }
+
+// input jumlah funding dari user
+// handler tangkap input lalu di-mapping ke input struct
+// panggil service buat transaksi, manggil sistem midtrans
+// panggil repository, create new transaction data
