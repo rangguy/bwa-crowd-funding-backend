@@ -51,7 +51,7 @@ func (s *service) CreateTransaction(input CreateTransactionInput) (Transaction, 
 	transaction := Transaction{
 		Amount:     input.Amount,
 		CampaignID: input.CampaignID,
-		ID:         input.User.ID,
+		UserID:     input.User.ID,
 		Status:     "pending",
 	}
 

@@ -61,6 +61,30 @@ func (h *TransactionHandler) GetTransactionsByUserID(c *gin.Context) {
 	return
 }
 
+func (h *TransactionHandler) CreateTransaction(c *gin.Context) {
+	var input transaction.CreateTransactionInput
+	err := c.ShouldBindJSON(&input)
+	if err != nil {
+		response := helper.APIResponse("Failed to create transaction", http.StatusUnprocessableEntity, "error", nil)
+		c.JSON(http.StatusUnprocessableEntity, response)
+		return
+	}
+
+	currentUser := c.MustGet("currentUser").(user.User)
+	input.User = currentUser
+
+	newTransaction, err := h.service.CreateTransaction(input)
+	if err != nil {
+		response := helper.APIResponse("Failed to create transaction", http.StatusBadRequest, "error", nil)
+		c.JSON(http.StatusBadRequest, response)
+		return
+	}
+
+	response := helper.APIResponse("Successfully created transaction", http.StatusOK, "success", newTransaction)
+	c.JSON(http.StatusOK, response)
+	return
+}
+
 // input jumlah funding dari user
 // handler tangkap input lalu di-mapping ke input struct
 // panggil service buat transaksi, manggil sistem midtrans
