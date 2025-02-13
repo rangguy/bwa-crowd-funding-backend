@@ -58,6 +58,7 @@ func main() {
 	// transactions
 	api.GET("/campaigns/:id/transactions", authMiddleware(authService, userService), transactionHandler.GetTransactionsByCampaignID)
 	api.GET("/transactions", authMiddleware(authService, userService), transactionHandler.GetTransactionsByUserID)
+	api.POST("/transactions", authMiddleware(authService, userService), transactionHandler.CreateTransaction)
 
 	err = router.Run()
 	if err != nil {
