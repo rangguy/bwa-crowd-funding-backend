@@ -3,6 +3,7 @@ package auth
 import (
 	"errors"
 	"github.com/golang-jwt/jwt/v5"
+	"os"
 )
 
 type Service interface {
@@ -13,7 +14,7 @@ type Service interface {
 type jwtService struct {
 }
 
-var SECRET_KEY = []byte("ASDWASDQWERQASDACAQWE")
+var secretKey = []byte(os.Getenv("JWT_KEY"))
 
 func NewService() Service {
 	return &jwtService{}
@@ -27,7 +28,7 @@ func (j *jwtService) GenerateToken(userID int) (string, error) {
 	token := jwt.NewWithClaims(jwt.SigningMethodHS256, claim)
 
 	// signing token
-	signedToken, err := token.SignedString(SECRET_KEY)
+	signedToken, err := token.SignedString(secretKey)
 	if err != nil {
 		return signedToken, err
 	}
@@ -41,7 +42,7 @@ func (j *jwtService) ValidateToken(tokenString string) (*jwt.Token, error) {
 			return nil, errors.New("Invalid token")
 		}
 
-		return SECRET_KEY, nil
+		return secretKey, nil
 	})
 
 	if err != nil {
