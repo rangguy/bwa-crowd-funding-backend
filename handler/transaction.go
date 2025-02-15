@@ -80,12 +80,7 @@ func (h *TransactionHandler) CreateTransaction(c *gin.Context) {
 		return
 	}
 
-	response := helper.APIResponse("Successfully created transaction", http.StatusOK, "success", newTransaction)
+	response := helper.APIResponse("Successfully created transaction", http.StatusOK, "success", transaction.FormatTransactions(newTransaction))
 	c.JSON(http.StatusOK, response)
 	return
 }
-
-// input jumlah funding dari user
-// handler tangkap input lalu di-mapping ke input struct
-// panggil service buat transaksi, manggil sistem midtrans
-// panggil repository, create new transaction data
