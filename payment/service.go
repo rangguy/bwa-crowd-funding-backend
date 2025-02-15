@@ -2,7 +2,7 @@ package payment
 
 import (
 	"bwastartup/user"
-	"github.com/veritrans/go-midtrans"
+	midtrans "github.com/veritrans/go-midtrans"
 	"os"
 	"strconv"
 )
