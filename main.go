@@ -39,12 +39,12 @@ func main() {
 	userService := user.NewService(userRepo)
 	campaignService := campaign.NewService(campaignRepo)
 	authService := auth.NewService()
-	paymentService := payment.NewService(transactionRepo, campaignRepo)
+	paymentService := payment.NewService()
 	transactionService := transaction.NewService(transactionRepo, campaignRepo, paymentService)
 
 	userHandler := handler.NewUserHandler(userService, authService)
 	campaignHandler := handler.NewCampaignHandler(campaignService)
-	transactionHandler := handler.NewTransactionHandler(transactionService, paymentService)
+	transactionHandler := handler.NewTransactionHandler(transactionService)
 
 	router := gin.Default()
 	router.Static("/images", "./images")

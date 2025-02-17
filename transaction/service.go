@@ -4,12 +4,14 @@ import (
 	"bwastartup/campaign"
 	"bwastartup/payment"
 	"errors"
+	"strconv"
 )
 
 type Service interface {
 	GetTransactionsByCampaignID(campaignID GetTransactionByCampaignIDInput) ([]Transaction, error)
 	GetTransactionsByUserID(userID int) ([]Transaction, error)
 	CreateTransaction(input CreateTransactionInput) (Transaction, error)
+	ProcessPayment(input TransactionNotificationInput) error
 }
 
 type service struct {
@@ -19,7 +21,11 @@ type service struct {
 }
 
 func NewService(repo Repository, campaignRepo campaign.Repository, paymentService payment.Service) Service {
-	return &service{repo, campaignRepo, paymentService}
+	return &service{
+		repo:           repo,
+		campaignRepo:   campaignRepo,
+		paymentService: paymentService,
+	}
 }
 
 func (s *service) GetTransactionsByCampaignID(input GetTransactionByCampaignIDInput) ([]Transaction, error) {
@@ -80,4 +86,43 @@ func (s *service) CreateTransaction(input CreateTransactionInput) (Transaction, 
 	}
 
 	return newTransaction, nil
+}
+
+func (s *service) ProcessPayment(input TransactionNotificationInput) error {
+	transaction_id, _ := strconv.Atoi(input.OrderID)
+
+	transaction, err := s.repo.GetByID(transaction_id)
+	if err != nil {
+		return err
+	}
+
+	if input.PaymentType == "credit_card" && input.TransactionStatus == "capture" && input.FraudStatus == "accept" {
+		transaction.Status = "paid"
+	} else if input.TransactionStatus == "settlement" {
+		transaction.Status = "paid"
+	} else if input.TransactionStatus == "deny" || input.TransactionStatus == "expire" || input.TransactionStatus == "cancel" {
+		transaction.Status = "cancelled"
+	}
+
+	updatedTransaction, err := s.repo.Update(transaction)
+	if err != nil {
+		return err
+	}
+
+	campaign, err := s.campaignRepo.FindByID(updatedTransaction.CampaignID)
+	if err != nil {
+		return err
+	}
+
+	if updatedTransaction.Status == "paid" {
+		campaign.BackerCount += 1
+		campaign.CurrentAmount += updatedTransaction.Amount
+
+		_, err = s.campaignRepo.Update(campaign)
+		if err != nil {
+			return err
+		}
+	}
+
+	return nil
 }
