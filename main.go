@@ -9,14 +9,16 @@ import (
 	"bwastartup/transaction"
 	"bwastartup/user"
 	"fmt"
+	"log"
+	"net/http"
+	"strings"
+
+	"github.com/gin-contrib/cors"
 	"github.com/gin-gonic/gin"
 	"github.com/golang-jwt/jwt/v5"
 	"github.com/joho/godotenv"
 	"gorm.io/driver/postgres"
 	"gorm.io/gorm"
-	"log"
-	"net/http"
-	"strings"
 )
 
 func main() {
@@ -47,6 +49,7 @@ func main() {
 	transactionHandler := handler.NewTransactionHandler(transactionService)
 
 	router := gin.Default()
+	router.Use(cors.Default())
 	router.Static("/images", "./images")
 	api := router.Group("/api/v1")
 
