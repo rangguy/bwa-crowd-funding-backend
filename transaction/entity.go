@@ -19,3 +19,16 @@ type Transaction struct {
 	CreatedAt  time.Time
 	UpdatedAt  time.Time
 }
+
+type TransactionMigrate struct {
+	ID         int               `gorm:"primary_key;AUTO_INCREMENT"`
+	UserID     int               `gorm:"column:user_id"`
+	CampaignID int               `gorm:"column:campaign_id"`
+	Amount     int               `gorm:"column:amount;type:integer"`
+	Status     string            `gorm:"column:status;type:varchar"`
+	Code       string            `gorm:"column:code;type:varchar"`
+	CreatedAt  time.Time         `gorm:"default:CURRENT_TIMESTAMP"`
+	UpdatedAt  time.Time         `gorm:"default:CURRENT_TIMESTAMP"`
+	User       user.User         `gorm:"foreignKey:UserID"`
+	Campaign   campaign.Campaign `gorm:"foreignKey:CampaignID"`
+}

@@ -5,12 +5,14 @@ import (
 	"bwastartup/campaign"
 	"bwastartup/handler"
 	"bwastartup/helper"
+	"bwastartup/migrations"
 	"bwastartup/payment"
 	"bwastartup/transaction"
 	"bwastartup/user"
 	"fmt"
 	"log"
 	"net/http"
+	"os"
 	"strings"
 
 	"github.com/gin-contrib/cors"
@@ -27,12 +29,21 @@ func main() {
 		log.Fatal("Error loading .env file")
 	}
 
-	dsn := "host=localhost user=postgres password=postgresql dbname=bwastartup port=5432 sslmode=disable TimeZone=Asia/Shanghai"
+	dsn := fmt.Sprintf("host=%s user=%s password=%s dbname=%s port=%s sslmode=disable",
+		os.Getenv("PGHOST"),
+		os.Getenv("PGUSER"),
+		os.Getenv("PGPASSWORD"),
+		os.Getenv("PGDATABASE"),
+		os.Getenv("PGPORT"),
+	)
+
 	db, err := gorm.Open(postgres.Open(dsn), &gorm.Config{})
 	if err != nil {
-		log.Fatal(err.Error())
+		panic("failed to connect database")
 	}
-	fmt.Println("Connection Success")
+	fmt.Println("Successfully connected to database")
+
+	migrations.Migrations(db)
 
 	userRepo := user.NewRepository(db)
 	campaignRepo := campaign.NewRepository(db)
