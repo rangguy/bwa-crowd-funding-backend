@@ -1,5 +1,6 @@
-# environment
-.env
+# Git files
+.git/
+.gitignore
 
 # folder images
 images/
@@ -38,3 +39,18 @@ node_modules/
 *.swo
 *.bak
 *.old
+
+# Test binaries and coverage reports
+*.test
+coverage.out
+
+# Environment and configuration files
+.env
+
+# Miscellaneous
+*.md
+*.markdown
+
+# Ignore Docker-specific files if not needed in the image
+docker-compose.yml
+Dockerfile

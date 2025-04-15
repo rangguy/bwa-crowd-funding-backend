@@ -8,9 +8,8 @@ import (
 	"bwastartup/migrations"
 	"bwastartup/payment"
 	"bwastartup/transaction"
-	"bwastartup/user"
+	userS "bwastartup/user"
 	"fmt"
-	"log"
 	"net/http"
 	"os"
 	"strings"
@@ -25,18 +24,16 @@ import (
 )
 
 func main() {
-	err := godotenv.Load("config/.env")
-	if err != nil {
-		log.Fatal("Error loading .env file")
-	}
+	_ = godotenv.Load()
+
+	host := getEnvOrDefault("DB_HOST", "postgresql-crowd-funding")
+	user := getEnvOrDefault("DB_USER", "postgres")
+	password := getEnvOrDefault("DB_PASSWORD", "postgresql")
+	dbname := getEnvOrDefault("DB_NAME", "bwastartup")
+	port := getEnvOrDefault("DB_PORT", "5432")
 
 	dsn := fmt.Sprintf("host=%s user=%s password=%s dbname=%s port=%s sslmode=disable",
-		os.Getenv("PGHOST"),
-		os.Getenv("PGUSER"),
-		os.Getenv("PGPASSWORD"),
-		os.Getenv("PGDATABASE"),
-		os.Getenv("PGPORT"),
-	)
+		host, user, password, dbname, port)
 
 	db, err := gorm.Open(postgres.Open(dsn), &gorm.Config{})
 	if err != nil {
@@ -46,11 +43,11 @@ func main() {
 
 	migrations.Migrations(db)
 
-	userRepo := user.NewRepository(db)
+	userRepo := userS.NewRepository(db)
 	campaignRepo := campaign.NewRepository(db)
 	transactionRepo := transaction.NewRepository(db)
 
-	userService := user.NewService(userRepo)
+	userService := userS.NewService(userRepo)
 	campaignService := campaign.NewService(campaignRepo)
 	authService := auth.NewService()
 	paymentService := payment.NewService()
@@ -98,7 +95,7 @@ func main() {
 	}
 }
 
-func authMiddleware(authService auth.Service, userService user.Service) gin.HandlerFunc {
+func authMiddleware(authService auth.Service, userService userS.Service) gin.HandlerFunc {
 	return func(c *gin.Context) {
 		authHeader := c.Request.Header.Get("Authorization")
 
@@ -136,4 +133,12 @@ func authMiddleware(authService auth.Service, userService user.Service) gin.Hand
 
 		c.Set("currentUser", currentUser)
 	}
+}
+
+func getEnvOrDefault(key, defaultValue string) string {
+	value := os.Getenv(key)
+	if value == "" {
+		return defaultValue
+	}
+	return value
 }

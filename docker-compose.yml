@@ -1,0 +1,57 @@
+version: "3.8"
+
+services:
+  # PostgreSQL Service
+  postgresql-crowd-funding:
+    image: postgres:latest
+    container_name: postgresql-crowd-funding
+    restart: on-failure
+    env_file:
+      - .env
+    environment:
+      - POSTGRES_DB=${POSTGRES_DATABASE}
+      - POSTGRES_USER=${POSTGRES_USER}
+      - POSTGRES_PASSWORD=${POSTGRES_PASSWORD}
+#    ports:
+#      - "5432:5432"
+    volumes:
+      - postgresql-crowd-funding-data:/var/lib/postgresql/data
+    networks:
+      - crowd-funding-network-database
+
+  # API Contact Form Service
+  api-crowd-funding:
+    build: .
+    image: api-crowd-funding:1.0.0
+    container_name: api-crowd-funding
+    restart: on-failure
+    depends_on:
+      - postgresql-crowd-funding
+    env_file:
+      - .env
+    ports:
+      - "${HOST_API_PORT}:${CONT_API_PORT}"
+    environment:
+      - APP_PORT=${CONT_API_PORT}
+      - APP_TIMEZONE=Asia/Jakarta
+      - DB_HOST=postgresql-crowd-funding
+      - DB_PORT=5432
+      - DB_USER=${POSTGRES_USER}
+      - DB_PASSWORD=${POSTGRES_PASSWORD}
+      - DB_NAME=${POSTGRES_DATABASE}
+      - CORS_ALLOWED_ORIGINS=http://localhost:3000
+      - CORS_ALLOWED_METHODS=GET,POST,PUT,DELETE,OPTIONS
+      - CORS_ALLOWED_HEADERS=Origin,Content-Type,Accept,Authorization
+      - CORS_ALLOW_CREDENTIALS=true
+      - CORS_EXPOSE_HEADERS=Content-Length,Content-Type
+    volumes:
+      - ./images:/app/images
+    networks:
+      - crowd-funding-network-database
+
+volumes:
+  postgresql-crowd-funding-data:
+
+networks:
+  crowd-funding-network-database:
+    driver: bridge
