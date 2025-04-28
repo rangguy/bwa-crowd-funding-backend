@@ -12,10 +12,25 @@ services:
       - POSTGRES_DB=${POSTGRES_DATABASE}
       - POSTGRES_USER=${POSTGRES_USER}
       - POSTGRES_PASSWORD=${POSTGRES_PASSWORD}
-#    ports:
-#      - "5432:5432"
+    #    ports:
+    #      - "5432:5432"
     volumes:
       - postgresql-crowd-funding-data:/var/lib/postgresql/data
+    networks:
+      - crowd-funding-network-database
+
+  # pgAdmin Service
+  pgadmin-crowd-funding:
+    image: dpage/pgadmin4:latest
+    container_name: pgadmin-crowd-funding
+    restart: on-failure
+    environment:
+      - PGADMIN_DEFAULT_EMAIL=${PGADMIN_EMAIL}
+      - PGADMIN_DEFAULT_PASSWORD=${PGADMIN_PASSWORD}
+    ports:
+      - "5050:80" # Mengakses pgAdmin dari http://localhost:5050
+    depends_on:
+      - postgresql-crowd-funding
     networks:
       - crowd-funding-network-database
 

@@ -10,7 +10,7 @@ import (
 
 func Migrations(db *gorm.DB) {
 	var err error
-	err = db.AutoMigrate(&user.UserMigrate{}, &campaign.CampaignMigrate{}, &campaign.CampaignImageMigrate{}, &transaction.TransactionMigrate{})
+	err = db.AutoMigrate(&user.User{}, &campaign.Campaign{}, &campaign.CampaignImage{}, &transaction.Transaction{})
 	if err != nil {
 		panic(err)
 	}
