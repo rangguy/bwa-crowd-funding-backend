@@ -30,6 +30,13 @@ func (h *CampaignHandler) GetCampaigns(c *gin.Context) {
 		return
 	}
 
+	if len(campaigns) == 0 {
+		response := helper.APIResponse("empty campaign", http.StatusOK, "success", nil)
+
+		c.JSON(http.StatusOK, response)
+		return
+	}
+
 	campaignsFormat := campaign.FormatCampaigns(campaigns)
 
 	response := helper.APIResponse("List of campaigns", http.StatusOK, "success", campaignsFormat)
@@ -52,6 +59,12 @@ func (h *CampaignHandler) GetCampaign(c *gin.Context) {
 	if err != nil {
 		response := helper.APIResponse("Failed to get detail of campaign", http.StatusBadRequest, "error", nil)
 		c.JSON(http.StatusBadRequest, response)
+		return
+	}
+
+	if campaignDetail.ID == 0 {
+		response := helper.APIResponse("empty campaign detail", http.StatusOK, "success", nil)
+		c.JSON(http.StatusOK, response)
 		return
 	}
 
